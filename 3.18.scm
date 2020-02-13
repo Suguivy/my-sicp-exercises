@@ -1,0 +1,8 @@
+(define (is-cycle x)
+  (let ((visited '()))
+    (define (recurse x)
+      (cond ((null? x) false)
+            ((memq x visited) true)
+            (else (set! visited (cons x visited))
+                  (recurse (cdr x)))))
+    (recurse x)))

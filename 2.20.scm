@@ -1,0 +1,10 @@
+(define nil '())
+(define (same-parity first . list)
+  (let ((same-parity-as-first?
+	 (cond ((even? first) even?)
+	       (else odd?))))
+    (define (build-list remaining)
+      (cond ((null? remaining) nil)
+	    ((same-parity-as-first? (car remaining)) (cons (car remaining) (build-list (cdr remaining))))
+	    (else (build-list (cdr remaining)))))
+    (cons first (build-list list))))

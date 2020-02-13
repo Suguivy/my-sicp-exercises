@@ -1,0 +1,1 @@
+;; Este no lo hago porque es bastante obvio, no aprenderé mucho y parece bastante ambiguo y tedioso de hacer. Lo importante que se recalca es que se pueden modificar las cosas trabajando en diferentes niveles de abstracción sin tener que modificar el resto

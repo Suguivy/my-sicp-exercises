@@ -1,0 +1,1 @@
+;; The steps are linear because in each iteration, one of the required values is already memoized. (memoize fib) doesn't work because in the procedure definition it calls fib, the procedure without memoizing capabilities.

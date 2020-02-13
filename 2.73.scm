@@ -1,0 +1,63 @@
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+	((variable? exp)
+	 (if (same-variable? exp var) 1 0))
+	((sum? exp)
+	 (make-sum (deriv (addend exp) var)
+		   (deriv (augend exp) var)))
+	((product? exp)
+	 (make-sum (make-product
+		    (multiplier exp)
+		    (deriv (multiplicand exp) var))
+		   (make-product
+		    (deriv (multiplier exp) var)
+		    (multiplicand exp))))
+	;; ⟨ more rules can be added here ⟩
+	(else (error "unknown expression type: DERIV" exp))))
+
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+	((variable? exp) (if (same-variable? exp var) 1 0))
+	(else ((get 'deriv (operator exp))
+	       (operands exp) var))))
+(define (operator exp) (car exp))
+(define (operands exp) (cdr exp))
+
+;; a) Primero se comprueba que la expresión sea un número, y en otro caso que sea una variable. En otro caso se aplica la data directed programming: se aplica a los operandos de la expresión el procedimiento que corresponde a la función que computa la derivación de una expresión con el operador de la expresión dada. No podemos usar number? y variable? en el data directed dispatcher porque no se pueden extraer el operador y los operandos de un número o una variable
+
+;; b)
+(define (install-sum-package)
+  (define (addend operands) (car operands))
+  (define (augend operands) (cdr operands))
+  (define (make-sum a b) (cons a b))
+  (define (deriv-sum operands var)
+    (tag (make-sum (deriv (addend operands) var)
+		   (deriv (augend operands) var))))
+  (put 'deriv '+ deriv-sum)
+  'done)
+
+(define (install-product-package)
+  (define (multiplier operands) (car operands))
+  (define (multiplicand operands) (cdr operands))
+  (define (make-product a b) (cons a b))
+  (define (deriv-product operands var)
+    (tag (make-sum (make-product (multiplier operands)
+				 (deriv (multiplicand operands)))
+		   (make-product (multiplicand operands)
+				 (deriv (multiplier operands))))))
+  (put 'deriv '* deriv-product)
+  'done)
+
+;; c)
+(define (install-expt-package)
+  (define (base operands) (car operands))
+  (define (exp operands) (cdr operands))
+  (define (make-expt a b) (cons a b))
+  (define (deriv-expt operands var)
+    (tag (make-product (exp operands)
+		       (make-product (make-expt (base operands) (- (exp operands) 1))
+				     (deriv (base operands))))))
+  (put 'deriv '** deriv-expt)
+  'done)
+
+;; d) We need to change the order of the first and second arguments on the put procedure

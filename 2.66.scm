@@ -1,0 +1,5 @@
+(define (lookup given-key set-of-records)
+  (cond ((null? set-of-records) false)
+	((= given-key (key (root set-of-records))) (root set-of-records))
+	((< given-key (key (root set-of-records))) (lookup given-key (left-branch set-of-records)))
+	(else (lookup given-key (right-branch set-of-records)))))

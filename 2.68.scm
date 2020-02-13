@@ -1,0 +1,20 @@
+(define (encode-symbol symbol tree)
+  (define (symbol-in-branch? symbol branch)
+    (define (element-of-set? x set)
+      (cond ((null? set) false)
+	    ((eq? x (car set)) true)
+	    (else (element-of-set? x (cdr set)))))
+    (element-of-set? symbol (symbols branch)))
+  (cond ((leaf? tree) (if (eq? (symbol-leaf tree) symbol)
+			 '()
+			 (error "symbol not recognized" symbol)))
+	((symbol-in-branch? symbol (left-branch tree)) (cons 0
+							    (encode-symbol symbol (left-branch tree))))
+        (else (cons 1
+		    (encode-symbol symbol (right-branch tree))))))
+
+(define (encode message tree)
+  (if (null? message)
+      '()
+      (append (encode-symbol (car message) tree)
+	      (encode (cdr message) tree))))

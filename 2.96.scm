@@ -1,0 +1,20 @@
+(define (pseudoremainder-terms P-terms Q-terms)
+  (let ((integerizing-factor (expt (coeff (first-term P-terms))
+                                   (+ (- (order (first-term P-terms))
+                                         (order (first-term Q-terms)))
+                                      1))))
+    (cdr (div-terms (map (lambda (term)
+                           (make-term (order term)
+                                      (mul integerizing-factor (coeff term))))
+                         P-terms)
+                    Q-terms))))
+
+(define (gcd-terms a b)
+    (if (empty-list? b)
+        (let ((d (apply gcd (map cadr a))))
+          (map (lambda (term) (make-term (order term)
+                                         (/ (coeff term) d)))
+               a))
+        (gcd-terms b (pseudoremainder-terms a b))))
+
+                                      
